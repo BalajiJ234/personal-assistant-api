@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  personal-assistant-api:
+    build: .
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - WEALTH_PULSE_API_URL=http://wealth-pulse-api:3001/api
+      - LIFE_NOTES_API_URL=http://life-notes-api:3002/api
+      - CORS_ORIGIN=http://localhost:3000
+    depends_on:
+      - wealth-pulse-api
+      - life-notes-api
+    networks:
+      - life-sync-network
+
+  # These would come from their respective repos
+  # wealth-pulse-api:
+  #   build: ../wealth-pulse-api
+  #   ports:
+  #     - "3001:3001"
+  #   networks:
+  #     - life-sync-network
+  
+  # life-notes-api:
+  #   build: ../life-notes-api
+  #   ports:
+  #     - "3002:3002"
+  #   networks:
+  #     - life-sync-network
+
+networks:
+  life-sync-network:
+    driver: bridge
