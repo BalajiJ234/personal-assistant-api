@@ -13,6 +13,6 @@ services:
       - key: PORT
         value: 3003
       - key: WEALTH_PULSE_API_URL
-        value: https://wealth-pulse-api.onrender.com
+        value: https://wealth-pulse-api.onrender.com/api
       - key: LIFE_NOTES_API_URL
-        value: https://life-notes-api.onrender.com
+        value: https://life-notes-api.onrender.com/api
