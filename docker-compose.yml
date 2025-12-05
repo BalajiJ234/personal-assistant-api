@@ -4,7 +4,7 @@ services:
   personal-assistant-api:
     build: .
     ports:
-      - "3003:3003"
+      - '3003:3003'
     environment:
       - NODE_ENV=development
       - PORT=3003
@@ -24,7 +24,7 @@ services:
   #     - "3001:3001"
   #   networks:
   #     - life-sync-network
-  
+
   # life-notes-api:
   #   build: ../life-notes-api
   #   ports:

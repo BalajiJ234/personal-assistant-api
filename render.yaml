@@ -2,7 +2,7 @@ services:
   - type: web
     name: personal-assistant-api
     env: node
-    region: singapore  # Closest to UAE/India
+    region: singapore # Closest to UAE/India
     plan: free
     buildCommand: npm install && npm run build
     startCommand: npm start

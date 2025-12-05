@@ -11,7 +11,12 @@
     "lint": "eslint src/",
     "format": "prettier --write src/"
   },
-  "keywords": ["ai", "assistant", "orchestrator", "life-sync"],
+  "keywords": [
+    "ai",
+    "assistant",
+    "orchestrator",
+    "life-sync"
+  ],
   "author": "Balaji J",
   "license": "MIT",
   "dependencies": {

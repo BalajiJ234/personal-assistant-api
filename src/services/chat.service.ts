@@ -30,10 +30,7 @@ const patterns = {
   help: /(?:help|what can you do|commands)/i,
 };
 
-export async function processMessage(
-  message: string,
-  _history: Message[]
-): Promise<ChatResponse> {
+export async function processMessage(message: string, _history: Message[]): Promise<ChatResponse> {
   const lowerMessage = message.toLowerCase();
 
   // Greeting
@@ -79,15 +76,19 @@ Just chat naturally and I'll help you!`,
     try {
       const response = await axios.get(`${config.apis.wealthPulse}/expenses`);
       const expenses = response.data.expenses || [];
-      
+
       if (expenses.length === 0) {
-        return { content: "You don't have any expenses logged yet. Try saying 'Add expense ₹500 for lunch'" };
+        return {
+          content:
+            "You don't have any expenses logged yet. Try saying 'Add expense ₹500 for lunch'",
+        };
       }
 
       const expenseList = expenses
         .slice(0, 5)
-        .map((e: { amount: number; category: string; description: string }) => 
-          `• ₹${e.amount} - ${e.category}: ${e.description}`
+        .map(
+          (e: { amount: number; category: string; description: string }) =>
+            `• ₹${e.amount} - ${e.category}: ${e.description}`
         )
         .join('\n');
 
@@ -96,7 +97,9 @@ Just chat naturally and I'll help you!`,
         actions: [{ type: 'query_result', data: { expenses } }],
       };
     } catch {
-      return { content: "Sorry, I couldn't fetch your expenses. The expense service might be offline." };
+      return {
+        content: "Sorry, I couldn't fetch your expenses. The expense service might be offline.",
+      };
     }
   }
 
@@ -105,7 +108,7 @@ Just chat naturally and I'll help you!`,
     try {
       const response = await axios.get(`${config.apis.lifeNotes}/notes`);
       const notes = response.data.notes || [];
-      
+
       if (notes.length === 0) {
         return { content: "You don't have any notes yet. Try saying 'Add a note: Your note here'" };
       }
@@ -129,15 +132,16 @@ Just chat naturally and I'll help you!`,
     try {
       const response = await axios.get(`${config.apis.lifeNotes}/todos`);
       const todos = response.data.todos || [];
-      
+
       if (todos.length === 0) {
         return { content: "You don't have any todos yet. Try saying 'Add a todo: Your task here'" };
       }
 
       const todoList = todos
         .slice(0, 5)
-        .map((t: { title: string; type: string; completed: boolean }) => 
-          `• [${t.completed ? '✓' : ' '}] ${t.title} (${t.type})`
+        .map(
+          (t: { title: string; type: string; completed: boolean }) =>
+            `• [${t.completed ? '✓' : ' '}] ${t.title} (${t.type})`
         )
         .join('\n');
 

@@ -4,12 +4,12 @@ AI Orchestrator API for Life-Sync 2.0. This service acts as the central hub that
 
 ## Part of Life-Sync 2.0 Ecosystem
 
-| Service | Type | Port | Description |
-|---------|------|------|-------------|
-| wealth-pulse-api | Backend | 3001 | Expense tracking API |
-| life-notes-api | Backend | 3002 | Notes & Todos API |
-| **personal-assistant-api** | Backend | 3003 | AI Orchestrator |
-| personal-assistant | Frontend | 3000 | Chat UI |
+| Service                    | Type     | Port | Description          |
+| -------------------------- | -------- | ---- | -------------------- |
+| wealth-pulse-api           | Backend  | 3001 | Expense tracking API |
+| life-notes-api             | Backend  | 3002 | Notes & Todos API    |
+| **personal-assistant-api** | Backend  | 3003 | AI Orchestrator      |
+| personal-assistant         | Frontend | 3000 | Chat UI              |
 
 ## Features
 
@@ -30,11 +30,13 @@ AI Orchestrator API for Life-Sync 2.0. This service acts as the central hub that
 ## API Endpoints
 
 ### Health
+
 ```
 GET /api/health - Service health with downstream status
 ```
 
 ### Chat
+
 ```
 POST /api/chat - Send message to assistant
 GET /api/chat - List all conversations
@@ -42,6 +44,7 @@ GET /api/chat/:conversationId - Get conversation history
 ```
 
 ### Proxy (Direct access to downstream APIs)
+
 ```
 GET/POST /api/proxy/expenses - Wealth Pulse API
 GET/POST /api/proxy/notes - Life Notes API
@@ -52,6 +55,7 @@ GET /api/proxy/todos/:type - Todos by type
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - wealth-pulse-api running on port 3001
 - life-notes-api running on port 3002
