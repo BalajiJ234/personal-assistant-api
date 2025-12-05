@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: personal-assistant-api
+    env: node
+    region: singapore  # Closest to UAE/India
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3003
+      - key: WEALTH_PULSE_API_URL
+        value: https://wealth-pulse-api.onrender.com
+      - key: LIFE_NOTES_API_URL
+        value: https://life-notes-api.onrender.com
