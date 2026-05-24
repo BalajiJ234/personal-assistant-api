@@ -7,6 +7,7 @@ import { config } from './config/index.js';
 import { healthRouter } from './routes/health.routes.js';
 import { chatRouter } from './routes/chat.routes.js';
 import { proxyRouter } from './routes/proxy.routes.js';
+import { financeRouter } from './routes/finance.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/health', healthRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/proxy', proxyRouter);
+app.use('/api/finance', financeRouter);
 
 // Error handling
 app.use(notFoundHandler);
