@@ -191,6 +191,7 @@ const COMMITMENT_KEYWORDS = [
   'insurance due', 'renewal', 'due in', 'pay on', 'payable on',
   'commitment', 'monthly commitment', 'monthly payment', 'monthly fee',
   'monthly gym', 'monthly subscription', 'monthly bill',
+  'gold chit', 'savings chit', 'chit fund', 'chitty',
 ];
 const PURCHASE_GOAL_KEYWORDS = [
   'want to buy', 'planning to buy', 'need to buy', 'saving for', 'wish list',
@@ -203,6 +204,12 @@ const INCOME_KEYWORDS = [
 
 function detectType(text: string): ParsedType {
   const lower = text.toLowerCase();
+
+  // Monthly/regular chit savings are treated as commitments in business flow.
+  if (/\b(?:gold\s+chit|savings\s+chit|chit\s+fund|chitty)\b/.test(lower)) {
+    return 'COMMITMENT';
+  }
+
   if (PURCHASE_GOAL_KEYWORDS.some((kw) => lower.includes(kw))) return 'PURCHASE_GOAL';
   if (DEBT_KEYWORDS.some((kw) => lower.includes(kw))) return 'DEBT';
   if (COMMITMENT_KEYWORDS.some((kw) => lower.includes(kw))) return 'COMMITMENT';
@@ -337,9 +344,21 @@ function extractTitle(text: string, type: ParsedType = 'EXPENSE'): string {
     .replace(/\s{2,}/g, ' ')
     .trim();
 
+  // Strip leading date fragments so title is semantic, not timestamp-heavy.
+  clean = clean
+    .replace(/^(?:on\s+)?\d{1,2}(?:st|nd|rd|th)\s+(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\b\s*/i, '')
+    .replace(/^(?:on\s+)?\d{1,2}\s+(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\b\s*/i, '')
+    .replace(/^(?:on\s+)?(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\s+\d{1,2}(?:st|nd|rd|th)?\b\s*/i, '')
+    .replace(/^(?:on\s+)?\d{4}-\d{2}-\d{2}\b\s*/i, '')
+    .replace(/^(?:on\s+)?\d{1,2}\/\d{1,2}\/\d{4}\b\s*/i, '')
+    .trim();
+
   // Strip leading action verbs (do NOT strip income-category nouns like "salary")
-  const ACTION_VERBS = /^\b(?:paid|spent|bought|sent|got paid|got)\b\s*/i;
+  const ACTION_VERBS = /^\b(?:paid|spent|bought|sent|got paid|got)\b\s*(?:for\s+)?/i;
   clean = clean.replace(ACTION_VERBS, '');
+  clean = clean.replace(/^\bfor\b\s+/i, '');
+  clean = clean.replace(/^\d+(?:[.,]\d{1,2})?\b\s*/i, '');
+  clean = clean.replace(/^\bfor\b\s+/i, '');
 
   // For INCOME: strip "received" prefix but keep what follows as title
   // e.g. "received 9000 AED" → already amount stripped → "received" → strip that
