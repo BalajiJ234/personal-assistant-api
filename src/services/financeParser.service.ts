@@ -229,6 +229,30 @@ function detectDate(text: string): string {
     return d.toISOString().split('T')[0];
   }
 
+  // "1st May", "2nd June", "3rd April" (ordinal day before month name)
+  const ordinalDayMonthMatch = lower.match(/\b(\d{1,2})(?:st|nd|rd|th)\s+([a-z]+)/);
+  if (ordinalDayMonthMatch) {
+    const day = parseInt(ordinalDayMonthMatch[1]);
+    const monthNum = MONTH_MAP[ordinalDayMonthMatch[2]];
+    if (monthNum) {
+      const year =
+        monthNum < today.getMonth() + 1 ? today.getFullYear() + 1 : today.getFullYear();
+      return `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  }
+
+  // "1 May", "15 June" (plain day before month name, no ordinal)
+  const dayMonthMatch = lower.match(/\b(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\b/);
+  if (dayMonthMatch) {
+    const day = parseInt(dayMonthMatch[1]);
+    const monthNum = MONTH_MAP[dayMonthMatch[2]];
+    if (monthNum) {
+      const year =
+        monthNum < today.getMonth() + 1 ? today.getFullYear() + 1 : today.getFullYear();
+      return `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  }
+
   // "due on June 5" or "June 5" or "5 June"
   const monthDayMatch = lower.match(
     /(?:due\s+on\s+|on\s+)?([a-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?/
