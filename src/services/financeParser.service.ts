@@ -189,6 +189,8 @@ const DEBT_KEYWORDS = [
 const COMMITMENT_KEYWORDS = [
   'due on', 'due date', 'upcoming', 'recurring', 'monthly rent', 'subscription due',
   'insurance due', 'renewal', 'due in', 'pay on', 'payable on',
+  'commitment', 'monthly commitment', 'monthly payment', 'monthly fee',
+  'monthly gym', 'monthly subscription', 'monthly bill',
 ];
 const PURCHASE_GOAL_KEYWORDS = [
   'want to buy', 'planning to buy', 'need to buy', 'saving for', 'wish list',
@@ -298,15 +300,35 @@ function scoreConfidence(params: {
 
 // ─── Title Extraction ──────────────────────────────────────────────────────
 
-function extractTitle(text: string): string {
-  // Remove amount + currency
+/**
+ * Extracts a human-readable title from a raw text segment.
+ * Strips amounts, currencies, and action verbs — but preserves subject nouns.
+ * Type-aware: for INCOME entries, keeps salary/bonus/etc. as the title.
+ */
+function extractTitle(text: string, type: ParsedType = 'EXPENSE'): string {
+  // Remove amount + currency patterns first
   let clean = text
     .replace(/(?:[₹$€£]\s*\d+(?:[.,]\d{1,2})?)/g, '')
     .replace(/\d+(?:[.,]\d{1,2})?\s*(?:AED|INR|USD|EUR|GBP|dhs?|rs)/gi, '')
-    .replace(/\b(?:paid|spent|bought|sent|received|got|salary|income|debt|credit card|loan|emi|due on|upcoming|want to buy|planning to buy)\b/gi, '')
-    .replace(/[,;]/g, ' ')
     .replace(/\s{2,}/g, ' ')
     .trim();
+
+  // Strip leading action verbs (do NOT strip income-category nouns like "salary")
+  const ACTION_VERBS = /^\b(?:paid|spent|bought|sent|got paid|got)\b\s*/i;
+  clean = clean.replace(ACTION_VERBS, '');
+
+  // For INCOME: strip "received" prefix but keep what follows as title
+  // e.g. "received 9000 AED" → already amount stripped → "received" → strip that
+  if (type === 'INCOME') {
+    clean = clean.replace(/^\b(?:received|income received|payment received|earned)\b\s*/i, '');
+    // If nothing left, use "Income" as fallback
+    clean = clean.trim();
+    if (clean.length < 2) clean = 'Income';
+  } else {
+    // For non-income, strip type-indicator words
+    clean = clean.replace(/\b(?:received|debt|credit card|loan|emi|due on|upcoming|want to buy|planning to buy|need to buy)\b/gi, '');
+    clean = clean.replace(/\s{2,}/g, ' ').trim();
+  }
 
   return clean.length > 2 ? clean.charAt(0).toUpperCase() + clean.slice(1) : 'Transaction';
 }
@@ -349,7 +371,7 @@ export function parseSingleLine(
     const entry: ParsedDebt = {
       id: genId(),
       type: 'DEBT',
-      debtName: extractTitle(trimmed),
+      debtName: extractTitle(trimmed, 'DEBT'),
       totalAmount: amount ?? 0,
       currency,
       debtType: detectDebtType(trimmed),
@@ -371,7 +393,7 @@ export function parseSingleLine(
     const entry: ParsedCommitment = {
       id: genId(),
       type: 'COMMITMENT',
-      title: extractTitle(trimmed),
+      title: extractTitle(trimmed, 'COMMITMENT'),
       amount: amount ?? 0,
       currency,
       dueDate: date,
@@ -393,7 +415,7 @@ export function parseSingleLine(
     const entry: ParsedPurchaseGoal = {
       id: genId(),
       type: 'PURCHASE_GOAL',
-      itemName: extractTitle(trimmed),
+      itemName: extractTitle(trimmed, 'PURCHASE_GOAL'),
       estimatedCost: amount ?? 0,
       currency,
       targetDate: '',
@@ -425,7 +447,7 @@ export function parseSingleLine(
   const entry: ParsedTransaction = {
     id: genId(),
     type: txType,
-    title: extractTitle(trimmed),
+    title: extractTitle(trimmed, txType),
     amount: amount ?? 0,
     currency,
     category,
